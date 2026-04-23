@@ -1,0 +1,14 @@
+#subtitleText {
+  position: absolute;
+  bottom: 10%;
+  width: 100%;
+  text-align: center;
+  font-family: 'Merriweather', serif;
+  font-size: 1.2rem;
+  color: white;
+  text-shadow: 0 2px 15px rgba(0,0,0,0.9);
+  opacity: 0; /* Mulai dari tidak terlihat */
+  transition: opacity 0.8s ease-in-out;
+  z-index: 5000; /* WAJIB: Lebih tinggi dari z-index polaroid */
+  pointer-events: none; /* Biar tidak mengganggu klik foto */
+}

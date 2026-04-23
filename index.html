@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Mama</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Playfair+Display:ital,wght@0,700;1,400&family=Poppins:wght@300;400;600&family=Merriweather:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #ff4d6d;
+            --bg: #050505;
+            --paper: #fdfaf0;
+            --line: #e0d9c5;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            color: white;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* PETALS BACKGROUND */
+        #petals-container { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
+        .petal { position: absolute; background: #ffb3c1; border-radius: 150% 0 150% 0; opacity: 0.2; animation: falling linear infinite; }
+        @keyframes falling {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+            100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* LANDING PAGE */
+        #landing {
+            position: fixed; inset: 0; display: flex; justify-content: center; align-items: center;
+            z-index: 9999; background: radial-gradient(circle at center, #1a1a1a, #000);
+            transition: opacity 1.5s ease;
+        }
+        .hero-box {
+            text-align: center; padding: 4rem; background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(25px); border-radius: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: float 4s ease-in-out infinite;
+        }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        
+        #startBtn {
+            padding: 20px 60px; font-size: 1.2rem; font-weight: 600; border-radius: 100px;
+            border: none; background: var(--primary); color: white; cursor: pointer;
+            transition: 0.4s; box-shadow: 0 10px 30px rgba(255, 77, 109, 0.4);
+        }
+
+        /* CALENDAR */
+        #calendar { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 100; opacity: 0; transition: 1.5s ease; pointer-events: none; }
+        .cal-box { background: white; color: #333; padding: 40px; border-radius: 35px; box-shadow: 0 30px 60px rgba(0,0,0,0.6); text-align: center; }
+        .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin: 25px 0; }
+        .days span { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: 1s; }
+        .days .active { background: var(--primary); color: white; border-radius: 50%; font-weight: bold; }
+
+        /* SCENE & POLAROID */
+        #scene { display: none; position: relative; width: 100vw; height: 100vh; z-index: 5; }
+        .polaroid {
+            position: absolute; width: 260px; background: white; padding: 15px 15px 50px 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4); left: 50%; top: 50%;
+            opacity: 0; transform: translate(-50%, -50%) scale(0.2);
+            transition: opacity 1s, transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+        .polaroid.active { opacity: 1; transform: translate(-50%, -50%) rotate(var(--rot)) scale(1); }
+        .polaroid img { width: 100%; height: 240px; object-fit: cover; }
+
+        #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); opacity: 0; visibility: hidden; transition: 0.5s; z-index: 10000; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(8px); }
+        #overlay.show { opacity: 1; visibility: visible; }
+
+        #subtitleText { position: absolute; bottom: 8%; width: 100%; text-align: center; font-family: 'Merriweather'; font-size: 1.2rem; text-shadow: 0 2px 15px #000; opacity: 0; transition: 0.8s; z-index: 5000; pointer-events: none; }
+
+        /* FINAL STAGE & LETTER UI */
+        #final-stage { 
+            position: fixed; inset: 0; display: flex; justify-content: center; align-items: center; 
+            background: rgba(0,0,0,0.95); z-index: 20000; opacity: 0; visibility: hidden; 
+            transition: 2s ease; pointer-events: none;
+        }
+        #final-stage.show { opacity: 1; visibility: visible; pointer-events: auto; }
+
+        #envelope {
+            width: 280px; height: 180px; background: #fff; position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5); display: flex; flex-direction: column; justify-content: center; align-items: center;
+            border-radius: 4px;
+        }
+        #envelope .flap { position: absolute; top: 0; width: 100%; height: 60%; background: #f8f8f8; clip-path: polygon(0 0, 50% 100%, 100% 0); border-bottom: 1px solid #eee; }
+        #envelope .stamp { width: 40px; height: 45px; background: var(--primary); opacity: 0.8; position: absolute; top: 15px; right: 15px; border-radius: 2px; border: 2px dashed rgba(255,255,255,0.4); }
+
+        #openLetterBtn {
+            margin-top: 30px; padding: 15px 40px; background: var(--primary); color: white;
+            border: none; border-radius: 50px; font-family: 'Poppins'; font-weight: 600;
+            cursor: pointer; box-shadow: 0 10px 20px rgba(255, 77, 109, 0.4);
+            transition: 0.3s;
+        }
+
+        .letter-paper {
+            position: absolute; background: var(--paper);
+            background-image: linear-gradient(var(--line) 1px, transparent 1px);
+            background-size: 100% 30px;
+            padding: 60px 40px; width: 90%; max-width: 550px;
+            opacity: 0; transform: translateY(100px) rotate(2deg);
+            transition: 2.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 50px 100px rgba(0,0,0,0.8);
+            color: #2c2c2c; font-family: 'Merriweather'; border-radius: 2px;
+            z-index: 20005; pointer-events: none;
+        }
+        .letter-paper.show { opacity: 1; transform: translateY(0) rotate(0deg); pointer-events: auto; }
+        .letter-paper::before { content: ""; position: absolute; left: 30px; top: 0; bottom: 0; width: 2px; background: rgba(255,0,0,0.1); }
+        
+        #letterText { font-size: 1.1rem; line-height: 30px; font-style: italic; color: #444; }
+        .letter-footer { text-align: right; font-family: 'Dancing Script'; font-size: 3rem; color: var(--primary); margin-top: 40px; }
+
+        /* THE END TEXT */
+        #the-end {
+            position: fixed; inset: 0; display: flex; justify-content: center; align-items: center;
+            z-index: 30000; opacity: 0; visibility: hidden; transition: 3s ease;
+            font-family: 'Playfair Display'; font-size: 4rem; letter-spacing: 15px;
+            background: black; color: white; pointer-events: none;
+        }
+        #the-end.show { opacity: 1; visibility: visible; }
+    </style>
+</head>
+<body>
+
+<div id="petals-container"></div>
+
+<div id="landing">
+    <div class="hero-box">
+        <h1 style="font-family:'Dancing Script'; font-size: 5rem; color: var(--primary);">For Mama</h1>
+        <p style="color:white; opacity:0.6; margin-bottom: 2.5rem; font-style: italic;">A Story of Love & Gratitude</p>
+        <button id="startBtn">Open Memory</button>
+    </div>
+</div>
+
+<div id="scene">
+    <div id="overlay"><div id="overlay-content"></div></div>
+    <div id="polaroid-container"></div>
+    <div id="subtitleText"></div>
+</div>
+
+<div id="final-stage">
+    <div id="envelope-wrapper" style="display: flex; flex-direction: column; align-items: center;">
+        <div id="envelope">
+            <div class="flap"></div>
+            <div class="stamp"></div>
+            <div style="font-family:'Dancing Script'; font-size: 1.8rem; color: #333; margin-top: 40px;">To: Mama</div>
+        </div>
+        <button id="openLetterBtn">Baca Surat Mama</button>
+    </div>
+
+    <div class="letter-paper" id="realLetter">
+        <div id="letterText"></div>
+        <div class="letter-footer">Love you, always.</div>
+    </div>
+</div>
+
+<div id="the-end">THE END</div>
+
+<audio id="music" src="monokrom.mp3" preload="auto"></audio>
+
+<script>
+    const startBtn = document.getElementById("startBtn");
+    const music = document.getElementById("music");
+    const scene = document.getElementById("scene");
+    const subtitle = document.getElementById("subtitleText");
+    const container = document.getElementById("polaroid-container");
+    const overlay = document.getElementById("overlay");
+    const openBtn = document.getElementById("openLetterBtn");
+    const envelopeWrapper = document.getElementById("envelope-wrapper");
+    const realLetter = document.getElementById("realLetter");
+    const theEnd = document.getElementById("the-end");
+
+    let index = 1;
+    const totalPhotos = 30;
+
+    const texts = [
+        "selamat ulang tahun, ma", "makasih ya, buat semuanya",
+        "aku kadang emang ga banyak ngomong", "tapi aku inget kok",
+        "semoga mama sehat terus", "aku di sini kok, tenang aja"
+    ];
+
+    function updateSubtitle(t) {
+        subtitle.style.opacity = 0;
+        setTimeout(() => { subtitle.innerText = t; subtitle.style.opacity = 1; }, 400);
+    }
+
+    startBtn.onclick = () => {
+        music.play().then(() => { music.currentTime = 7; });
+        document.getElementById("landing").style.opacity = 0;
+        setTimeout(() => {
+            document.getElementById("landing").style.display = "none";
+            scene.style.display = "block";
+            showIntro();
+        }, 1500);
+    };
+
+    function showIntro() {
+        updateSubtitle("Sebuah cerita untuk Mama...");
+        setTimeout(() => {
+            subtitle.style.opacity = 0;
+            setTimeout(showCalendar, 1000);
+        }, 2500);
+    }
+
+    function showCalendar() {
+        const cal = document.createElement("div");
+        cal.id = "calendar";
+        cal.innerHTML = `<div class="cal-box">
+            <h2 style="font-family:'Playfair Display'">Mei 1984</h2>
+            <div class="days"><span style="opacity:0.2">30</span>
+            ${Array.from({length: 31}, (_, i) => `<span class="${i+1===7?'active':''}">${i+1}</span>`).join("")}</div>
+            <p style="font-size: 0.8rem; color: var(--primary); font-weight: 600; letter-spacing: 1px;">The Day A Queen Was Born</p>
+        </div>`;
+        scene.appendChild(cal);
+        setTimeout(() => {
+            cal.style.opacity = 1;
+            setTimeout(() => {
+                const activeDay = cal.querySelector(".active");
+                if(activeDay){
+                    activeDay.style.transform = "scale(1.8)";
+                    activeDay.style.boxShadow = "0 0 30px #ff4d6d";
+                }
+            }, 800);
+        }, 100);
+
+        setTimeout(() => {
+            cal.style.opacity = 0;
+            setTimeout(() => { cal.remove(); showNext(); }, 1500);
+        }, 4500);
+    }
+
+    function createPolaroid(src) {
+        const div = document.createElement("div");
+        div.className = "polaroid";
+        const phase = index / totalPhotos;
+        let rx = phase < 0.3 ? 12 : phase < 0.7 ? 28 : 45;
+        let ry = phase < 0.3 ? 8 : phase < 0.7 ? 22 : 35;
+        const x = (Math.random() * (rx * 2) - rx) + "vw";
+        const y = (Math.random() * (ry * 2) - ry) + "vh";
+        const r = (Math.random() * 40 - 20) + "deg";
+
+        div.style.left = `calc(50% + ${x})`;
+        div.style.top = `calc(50% + ${y})`;
+        div.style.setProperty("--rot", r);
+        div.style.zIndex = index;
+        div.innerHTML = `<img src="${src}" onerror="this.src='https://via.placeholder.com/260x240?text=Mama'">`;
+
+        div.onclick = (e) => {
+            e.stopPropagation();
+            const clone = div.cloneNode(true);
+            clone.style.left = "50%"; clone.style.top = "50%";
+            clone.style.transform = "translate(-50%, -50%) scale(1.5) rotate(0deg)";
+            document.getElementById("overlay-content").innerHTML = "";
+            document.getElementById("overlay-content").appendChild(clone);
+            overlay.classList.add("show");
+        };
+
+        container.appendChild(div);
+        setTimeout(() => div.classList.add("active"), 100);
+    }
+
+    function showNext() {
+        if (index > totalPhotos) {
+            subtitle.style.opacity = 0;
+            setTimeout(triggerDispersal, 3000);
+            return;
+        }
+        updateSubtitle(texts[(index - 1) % texts.length]);
+        createPolaroid(index.toString().padStart(2, '0') + ".jpeg");
+        index++;
+        setTimeout(showNext, 3000);
+    }
+
+    function triggerDispersal() {
+        container.style.pointerEvents = "none";
+        const photos = document.querySelectorAll(".polaroid");
+        photos.forEach((p) => {
+            const angle = Math.random() * Math.PI * 2;
+            const dist = 150 + Math.random() * 100;
+            const tx = Math.cos(angle) * dist + "vw";
+            const ty = Math.sin(angle) * dist + "vh";
+            const rot = (Math.random() * 1000 - 500) + "deg";
+            p.style.transition = "all 2.5s cubic-bezier(0.4, 0, 0.2, 1)";
+            p.style.transform = `translate(${tx}, ${ty}) rotate(${rot}) scale(0)`;
+            p.style.opacity = "0";
+        });
+        setTimeout(showFinal, 2000);
+    }
+
+    function showFinal() {
+        document.getElementById("final-stage").classList.add("show");
+        document.getElementById("letterText").innerText = 
+`Happy birthday, Mama.
+
+Semoga hari ini Mama ngerasa bahagia dan dicintai. Makasih ya Ma, untuk semua pengorbanan dan kasih sayang yang Mama kasih selama ini, bahkan untuk hal-hal kecil yang mungkin nggak selalu aku sadari.
+
+Aku tahu aku orangnya jarang ngomong atau nunjukin perasaan, tapi dalam hati, aku selalu bersyukur punya Mama.
+
+Tetap sehat ya, Ma. Jangan terlalu capek. I'm trying my best to make you proud.
+
+I love you, always.`;
+    }
+
+    // BUTTON CLICK HANDLER (DENGAN LOGIC DISPERSAL SURAT DI AKHIR)
+    openBtn.onclick = () => {
+        envelopeWrapper.style.transition = "0.8s";
+        envelopeWrapper.style.opacity = "0";
+        envelopeWrapper.style.transform = "scale(0.8) translateY(-50px)";
+        
+        setTimeout(() => {
+            envelopeWrapper.style.display = "none";
+            realLetter.classList.add("show");
+
+            // START TIMER 45 DETIK UNTUK ENDING
+            setTimeout(triggerLetterDispersal, 45000); 
+
+        }, 800);
+    };
+
+    function triggerLetterDispersal() {
+        // Efek dispersal surat
+        realLetter.style.transition = "all 3s cubic-bezier(0.4, 0, 0.2, 1)";
+        realLetter.style.transform = "translate(50vw, -100vh) rotate(500deg) scale(0)";
+        realLetter.style.opacity = "0";
+
+        // Munculkan THE END setelah surat terbang
+        setTimeout(() => {
+            theEnd.classList.add("show");
+            // Kecilkan musik pelan-pelan (fade out)
+            const fadeAudio = setInterval(() => {
+                if (music.volume > 0.1) {
+                    music.volume -= 0.1;
+                } else {
+                    music.pause();
+                    clearInterval(fadeAudio);
+                }
+            }, 300);
+        }, 2000);
+    }
+
+    overlay.onclick = () => overlay.classList.remove("show");
+
+    setInterval(() => {
+        const p = document.createElement("div");
+        p.className = "petal";
+        const size = (Math.random() * 15 + 10) + "px";
+        p.style.width = p.style.height = size;
+        p.style.left = Math.random() * 100 + "vw";
+        p.style.animationDuration = (Math.random() * 3 + 4) + "s";
+        document.getElementById("petals-container").appendChild(p);
+        setTimeout(() => p.remove(), 7000);
+    }, 300);
+</script>
+
+</body>
+</html>
