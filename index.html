@@ -65,11 +65,18 @@
             position: absolute; width: 260px; background: white; padding: 15px 15px 50px 15px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.4); left: 50%; top: 50%;
             opacity: 0; transform: translate(-50%, -50%) scale(0.2);
-            transition: opacity 1s, transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: opacity 1s, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
             cursor: pointer;
         }
         .polaroid.active { opacity: 1; transform: translate(-50%, -50%) rotate(var(--rot)) scale(1); }
-        .polaroid img { width: 100%; height: 240px; object-fit: cover; }
+        .polaroid img { width: 100%; height: 240px; object-fit: cover; border: 1px solid #eee; }
+
+        /* EFEK POP UP ON HOVER */
+        .polaroid.active:hover { 
+            transform: translate(-50%, -50%) rotate(0deg) scale(1.2) !important; 
+            z-index: 999 !important; 
+            box-shadow: 0 25px 50px rgba(255, 77, 109, 0.4);
+        }
 
         #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); opacity: 0; visibility: hidden; transition: 0.5s; z-index: 10000; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(8px); }
         #overlay.show { opacity: 1; visibility: visible; }
@@ -98,6 +105,7 @@
             cursor: pointer; box-shadow: 0 10px 20px rgba(255, 77, 109, 0.4);
             transition: 0.3s;
         }
+        #openLetterBtn:hover { transform: scale(1.05); }
 
         .letter-paper {
             position: absolute; background: var(--paper);
@@ -307,7 +315,6 @@ Tetap sehat ya, Ma. Jangan terlalu capek. I'm trying my best to make you proud.
 I love you, always.`;
     }
 
-    // BUTTON CLICK HANDLER (DENGAN LOGIC DISPERSAL SURAT DI AKHIR)
     openBtn.onclick = () => {
         envelopeWrapper.style.transition = "0.8s";
         envelopeWrapper.style.opacity = "0";
@@ -324,15 +331,12 @@ I love you, always.`;
     };
 
     function triggerLetterDispersal() {
-        // Efek dispersal surat
         realLetter.style.transition = "all 3s cubic-bezier(0.4, 0, 0.2, 1)";
         realLetter.style.transform = "translate(50vw, -100vh) rotate(500deg) scale(0)";
         realLetter.style.opacity = "0";
 
-        // Munculkan THE END setelah surat terbang
         setTimeout(() => {
             theEnd.classList.add("show");
-            // Kecilkan musik pelan-pelan (fade out)
             const fadeAudio = setInterval(() => {
                 if (music.volume > 0.1) {
                     music.volume -= 0.1;
